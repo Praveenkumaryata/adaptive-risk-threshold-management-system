@@ -1,137 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Adaptive Risk Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body {
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
-            text-align: center;
-        }
-
-        h1 {
-            margin-top: 20px;
-        }
-
-        .container {
-            width: 80%;
-            margin: auto;
-        }
-
-        .risk-box {
-            background: #1e293b;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 12px;
-        }
-
-        .progress {
-            background: #334155;
-            border-radius: 20px;
-            height: 25px;
-            margin-top: 10px;
-        }
-
-        .progress-bar {
-            height: 25px;
-            border-radius: 20px;
-            line-height: 25px;
-            color: white;
-            transition: width 1s ease-in-out;
-        }
-
-        canvas {
-            background: white;
-            border-radius: 12px;
-            padding: 10px;
-        }
-    </style>
+<title>Login - Risk Monitoring System</title>
+<style>
+body{
+    background: linear-gradient(135deg,#1d2671,#c33764);
+    font-family: Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.login-box{
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+    text-align:center;
+}
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+button{
+    padding:10px 20px;
+    background:#1d2671;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+</style>
 </head>
 
 <body>
 
-<h1>🚨 Real-Time Risk Monitoring Dashboard</h1>
-
-<div class="container">
-
-    <div class="risk-box">
-        <h3>App Risk</h3>
-        <div class="progress">
-            <div id="appRisk" class="progress-bar"></div>
-        </div>
-    </div>
-
-    <div class="risk-box">
-        <h3>OTP Risk</h3>
-        <div class="progress">
-            <div id="otpRisk" class="progress-bar"></div>
-        </div>
-    </div>
-
-    <div class="risk-box">
-        <h3>Transaction Risk</h3>
-        <div class="progress">
-            <div id="txnRisk" class="progress-bar"></div>
-        </div>
-    </div>
-
-    <h2>Overall Risk Distribution</h2>
-    <canvas id="riskChart" width="400" height="200"></canvas>
-
+<div class="login-box">
+<h2>Risk Monitoring Login</h2>
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="error" style="color:red;"></p>
 </div>
 
 <script>
+function login(){
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
 
-function setRisk(barId, value) {
-    let bar = document.getElementById(barId);
-    bar.style.width = value + "%";
-    bar.innerText = value + "%";
-
-    if (value < 40) {
-        bar.style.background = "green";
-    } else if (value < 70) {
-        bar.style.background = "orange";
-    } else {
-        bar.style.background = "red";
+    if(user==="admin" && pass==="1234"){
+        window.location.href="dashboard.html";
+    } else{
+        document.getElementById("error").innerText="Invalid Credentials";
     }
 }
-
-function generateRisks() {
-    let app = Math.floor(Math.random() * 100);
-    let otp = Math.floor(Math.random() * 100);
-    let txn = Math.floor(Math.random() * 100);
-
-    setRisk("appRisk", app);
-    setRisk("otpRisk", otp);
-    setRisk("txnRisk", txn);
-
-    updateChart(app, otp, txn);
-}
-
-let ctx = document.getElementById('riskChart').getContext('2d');
-
-let riskChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: ['App Risk', 'OTP Risk', 'Transaction Risk'],
-        datasets: [{
-            data: [0, 0, 0],
-            backgroundColor: ['#3b82f6', '#f59e0b', '#ef4444']
-        }]
-    }
-});
-
-function updateChart(app, otp, txn) {
-    riskChart.data.datasets[0].data = [app, otp, txn];
-    riskChart.update();
-}
-
-generateRisks();
-setInterval(generateRisks, 5000);
-
 </script>
 
 </body>
