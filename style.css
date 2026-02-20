@@ -1,38 +1,55 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     margin: 0;
-    background-color: #f4f6f8;
-    color: #333;
-    text-align: center;
-}
-
-header {
-    background-color: #123456;
-    color: white;
-    padding: 40px 20px;
-}
-
-section {
-    background-color: white;
-    margin: 30px auto;
-    padding: 25px;
-    width: 70%;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-h2 {
-    color: #123456;
-}
-
-ul {
-    list-style-type: none;
     padding: 0;
+    color: white;
 }
 
-footer {
-    background-color: #123456;
-    color: white;
+h1 {
+    padding: 20px;
+    font-size: 28px;
+    letter-spacing: 1px;
+}
+
+.container {
+    width: 85%;
+    margin: auto;
+}
+
+.risk-box {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    margin: 25px auto;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease;
+}
+
+.risk-box:hover {
+    transform: scale(1.02);
+}
+
+.progress {
+    background: rgba(255,255,255,0.15);
+    border-radius: 30px;
+    height: 30px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 30px;
+    border-radius: 30px;
+    line-height: 30px;
+    font-weight: bold;
+    transition: width 1s ease-in-out;
+}
+
+canvas {
+    margin-top: 30px;
+    background: white;
+    border-radius: 15px;
     padding: 15px;
-    margin-top: 40px;
 }
