@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Adaptive Risk Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    background:#0f172a;
+    font-family:Arial;
+    color:white;
+    text-align:center;
+}
+.risk-box{
+    background:#1e293b;
+    padding:20px;
+    margin:20px auto;
+    width:70%;
+    border-radius:10px;
+}
+.progress{
+    background:#334155;
+    height:25px;
+    border-radius:20px;
+}
+.progress-bar{
+    height:25px;
+    border-radius:20px;
+    transition:width 1s;
+}
+.alert{
+    font-size:20px;
+    font-weight:bold;
+    margin:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚨 Real-Time Risk Monitoring</h1>
+<div id="alertBox" class="alert"></div>
+
+<div class="risk-box">
+<h3>App Risk</h3>
+<div class="progress"><div id="app" class="progress-bar"></div></div>
+</div>
+
+<div class="risk-box">
+<h3>OTP Risk</h3>
+<div class="progress"><div id="otp" class="progress-bar"></div></div>
+</div>
+
+<div class="risk-box">
+<h3>Transaction Risk</h3>
+<div class="progress"><div id="txn" class="progress-bar"></div></div>
+</div>
+
+<canvas id="trendChart"></canvas>
+
+<script>
+let trendData = {
+    labels: [],
+    datasets:[{
+        label:'Overall Risk Trend',
+        data:[],
+        borderColor:'red',
+        fill:false
+    }]
+};
+
+let chart = new Chart(document.getElementById("trendChart"),{
+    type:'line',
+    data:trendData
+});
+
+function smartRisk(){
+    let otpAttempts = Math.floor(Math.random()*5);
+    let newDevice = Math.random()>0.7;
+    let highTxn = Math.random()>0.6;
+
+    let appRisk = newDevice?70:30;
+    let otpRisk = otpAttempts*15;
+    let txnRisk = highTxn?80:40;
+
+    updateBar("app",appRisk);
+    updateBar("otp",otpRisk);
+    updateBar("txn",txnRisk);
+
+    let overall = Math.floor((appRisk+otpRisk+txnRisk)/3);
+    updateAlert(overall);
+    updateTrend(overall);
+}
+
+function updateBar(id,val){
+    let bar=document.getElementById(id);
+    bar.style.width=val+"%";
+    bar.innerText=val+"%";
+
+    if(val<40) bar.style.background="green";
+    else if(val<70) bar.style.background="orange";
+    else bar.style.background="red";
+}
+
+function updateAlert(overall){
+    let alertBox=document.getElementById("alertBox");
+    if(overall>75){
+        alertBox.innerText="🔴 HIGH FRAUD ALERT!";
+        alertBox.style.color="red";
+    } else if(overall>50){
+        alertBox.innerText="🟡 MEDIUM RISK";
+        alertBox.style.color="orange";
+    } else{
+        alertBox.innerText="🟢 LOW RISK";
+        alertBox.style.color="green";
+    }
+}
+
+function updateTrend(val){
+    if(trendData.labels.length>10){
+        trendData.labels.shift();
+        trendData.datasets[0].data.shift();
+    }
+    trendData.labels.push("");
+    trendData.datasets[0].data.push(val);
+    chart.update();
+}
+
+smartRisk();
+setInterval(smartRisk,5000);
+</script>
+
+</body>
+</html>
