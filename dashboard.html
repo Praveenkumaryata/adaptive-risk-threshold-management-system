@@ -1,14 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Adaptive Risk Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
 body{
     margin:0;
     font-family: 'Segoe UI', sans-serif;
     background: radial-gradient(circle at top, #0f0c29, #302b63, #24243e);
-    color:#ffffff;
+    color:white;
     text-align:center;
 }
 
 h1{
     padding:20px;
-    font-size:28px;
     letter-spacing:2px;
     text-shadow:0 0 10px #00f7ff;
 }
@@ -16,53 +22,188 @@ h1{
 .risk-box{
     background: rgba(255,255,255,0.05);
     border:1px solid rgba(0,255,255,0.3);
-    backdrop-filter: blur(15px);
-    padding:25px;
-    margin:25px auto;
+    backdrop-filter: blur(10px);
+    padding:20px;
+    margin:20px auto;
     width:70%;
     border-radius:15px;
     box-shadow:0 0 20px rgba(0,255,255,0.4);
-    transition:0.3s;
-}
-
-.risk-box:hover{
-    transform:scale(1.03);
-    box-shadow:0 0 30px rgba(0,255,255,0.8);
 }
 
 .progress{
     background:rgba(255,255,255,0.1);
-    height:28px;
-    border-radius:30px;
-    margin-top:15px;
+    height:25px;
+    border-radius:20px;
     overflow:hidden;
 }
 
 .progress-bar{
-    height:28px;
-    border-radius:30px;
-    line-height:28px;
+    height:25px;
+    border-radius:20px;
+    line-height:25px;
     font-weight:bold;
-    text-shadow:0 0 5px black;
-    transition:width 1s ease-in-out;
+    transition:width 1s;
 }
 
 .alert{
-    font-size:22px;
+    font-size:20px;
     font-weight:bold;
-    margin:20px;
-    animation: glow 1.5s infinite alternate;
+    margin:15px;
 }
 
-@keyframes glow{
-    from { text-shadow:0 0 10px red; }
-    to { text-shadow:0 0 25px red; }
+button{
+    position:absolute;
+    right:20px;
+    top:20px;
+    padding:8px 15px;
+    background:#ff0033;
+    color:white;
+    border:none;
+    cursor:pointer;
+    border-radius:6px;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+if(localStorage.getItem("loggedIn") !== "true"){
+    window.location.href="index.html";
+}
+</script>
+
+<button onclick="logout()">Logout</button>
+
+<h1>🚨 AI Fraud Risk Monitoring</h1>
+
+<div id="alertBox" class="alert"></div>
+
+<div class="risk-box">
+<h3>AI Risk Explanation</h3>
+<p id="explanation"></p>
+</div>
+
+<div class="risk-box">
+<h3>App Risk</h3>
+<div class="progress"><div id="app" class="progress-bar"></div></div>
+</div>
+
+<div class="risk-box">
+<h3>OTP Risk</h3>
+<div class="progress"><div id="otp" class="progress-bar"></div></div>
+</div>
+
+<div class="risk-box">
+<h3>Transaction Risk</h3>
+<div class="progress"><div id="txn" class="progress-bar"></div></div>
+</div>
+
+<div class="risk-box">
+<h3>Activity Log</h3>
+<ul id="activityLog" style="text-align:left;"></ul>
+</div>
+
+<canvas id="trendChart"></canvas>
+
+<script>
+let trendData = {
+    labels: [],
+    datasets:[{
+        label:'Overall Risk Trend',
+        data:[],
+        borderColor:'#ff0033',
+        fill:false
+    }]
+};
+
+let chart = new Chart(document.getElementById("trendChart"),{
+    type:'line',
+    data:trendData
+});
+
+function smartRisk(){
+    let otpAttempts = Math.floor(Math.random()*5);
+    let newDevice = Math.random()>0.7;
+    let highTxn = Math.random()>0.6;
+
+    let appRisk = newDevice?75:25;
+    let otpRisk = otpAttempts*20;
+    let txnRisk = highTxn?85:35;
+
+    updateBar("app",appRisk);
+    updateBar("otp",otpRisk);
+    updateBar("txn",txnRisk);
+
+    let reasons = [];
+    if(newDevice) reasons.push("New device login detected.");
+    if(otpAttempts>2) reasons.push("Multiple OTP attempts detected.");
+    if(highTxn) reasons.push("High value transaction flagged.");
+    if(reasons.length===0) reasons.push("No suspicious activity detected.");
+
+    document.getElementById("explanation").innerText = reasons.join(" ");
+
+    let overall = Math.floor((appRisk+otpRisk+txnRisk)/3);
+    updateAlert(overall);
+    updateTrend(overall);
+    addLog(overall,reasons);
 }
 
-canvas{
-    margin-top:30px;
-    background:rgba(255,255,255,0.08);
-    border-radius:15px;
-    padding:15px;
-    box-shadow:0 0 20px rgba(0,255,255,0.5);
+function updateBar(id,val){
+    let bar=document.getElementById(id);
+    bar.style.width=val+"%";
+    bar.innerText=val+"%";
+
+    if(val<40) bar.style.background="#00ff88";
+    else if(val<70) bar.style.background="#ffcc00";
+    else bar.style.background="#ff0033";
 }
+
+function updateAlert(overall){
+    let alertBox=document.getElementById("alertBox");
+    if(overall>75){
+        alertBox.innerText="🔴 HIGH FRAUD ALERT!";
+        alertBox.style.color="#ff0033";
+    } else if(overall>50){
+        alertBox.innerText="🟡 MEDIUM RISK";
+        alertBox.style.color="#ffcc00";
+    } else{
+        alertBox.innerText="🟢 LOW RISK";
+        alertBox.style.color="#00ff88";
+    }
+}
+
+function updateTrend(val){
+    if(trendData.labels.length>10){
+        trendData.labels.shift();
+        trendData.datasets[0].data.shift();
+    }
+    trendData.labels.push("");
+    trendData.datasets[0].data.push(val);
+    chart.update();
+}
+
+function addLog(overall,reasons){
+    let log=document.getElementById("activityLog");
+    let time=new Date().toLocaleTimeString();
+
+    let li=document.createElement("li");
+    li.innerText=time+" - Risk: "+overall+"% - "+reasons.join(" ");
+    log.prepend(li);
+
+    if(log.children.length>5){
+        log.removeChild(log.lastChild);
+    }
+}
+
+function logout(){
+    localStorage.removeItem("loggedIn");
+    window.location.href="index.html";
+}
+
+smartRisk();
+setInterval(smartRisk,5000);
+</script>
+
+</body>
+</html>
