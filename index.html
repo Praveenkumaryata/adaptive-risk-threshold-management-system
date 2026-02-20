@@ -1,57 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Adaptive Risk Threshold Management System</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Adaptive Risk Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+
+        .risk-box {
+            background: #1e293b;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+        }
+
+        .progress {
+            background: #334155;
+            border-radius: 20px;
+            height: 25px;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 25px;
+            border-radius: 20px;
+            line-height: 25px;
+            color: white;
+            transition: width 1s ease-in-out;
+        }
+
+        canvas {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+        }
+    </style>
 </head>
+
 <body>
 
-<header>
-    <h1>Adaptive Risk Threshold Management System</h1>
-    <p>Java-Based Real-Time Adaptive Risk Control Framework</p>
-</header>
+<h1>🚨 Real-Time Risk Monitoring Dashboard</h1>
 
-<section>
-    <h2>Project Overview</h2>
-    <p>
-        This project implements an adaptive risk threshold engine
-        that dynamically adjusts alert thresholds using real-time
-        streaming data. It reduces false positives while maintaining
-        high true-positive detection rates.
-    </p>
-</section>
+<div class="container">
 
-<section>
-    <h2>Problem Statement</h2>
-    <p>
-        Static thresholds fail in volatile environments, leading
-        to alert fatigue and missed anomalies.
-    </p>
-</section>
+    <div class="risk-box">
+        <h3>App Risk</h3>
+        <div class="progress">
+            <div id="appRisk" class="progress-bar"></div>
+        </div>
+    </div>
 
-<section>
-    <h2>Technologies Used</h2>
-    <ul>
-        <li>Java</li>
-        <li>Apache Kafka</li>
-        <li>Apache Flink</li>
-        <li>Prometheus</li>
-    </ul>
-</section>
+    <div class="risk-box">
+        <h3>OTP Risk</h3>
+        <div class="progress">
+            <div id="otpRisk" class="progress-bar"></div>
+        </div>
+    </div>
 
-<section>
-    <h2>Key Features</h2>
-    <ul>
-        <li>Real-Time Threshold Adaptation</li>
-        <li>Feedback-Based Learning</li>
-        <li>Low-Latency Processing</li>
-        <li>Scalable Microservices Design</li>
-    </ul>
-</section>
+    <div class="risk-box">
+        <h3>Transaction Risk</h3>
+        <div class="progress">
+            <div id="txnRisk" class="progress-bar"></div>
+        </div>
+    </div>
 
-<footer>
-    <p>Developed by Nani | 2026</p>
-</footer>
+    <h2>Overall Risk Distribution</h2>
+    <canvas id="riskChart" width="400" height="200"></canvas>
+
+</div>
+
+<script>
+
+function setRisk(barId, value) {
+    let bar = document.getElementById(barId);
+    bar.style.width = value + "%";
+    bar.innerText = value + "%";
+
+    if (value < 40) {
+        bar.style.background = "green";
+    } else if (value < 70) {
+        bar.style.background = "orange";
+    } else {
+        bar.style.background = "red";
+    }
+}
+
+function generateRisks() {
+    let app = Math.floor(Math.random() * 100);
+    let otp = Math.floor(Math.random() * 100);
+    let txn = Math.floor(Math.random() * 100);
+
+    setRisk("appRisk", app);
+    setRisk("otpRisk", otp);
+    setRisk("txnRisk", txn);
+
+    updateChart(app, otp, txn);
+}
+
+let ctx = document.getElementById('riskChart').getContext('2d');
+
+let riskChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['App Risk', 'OTP Risk', 'Transaction Risk'],
+        datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: ['#3b82f6', '#f59e0b', '#ef4444']
+        }]
+    }
+});
+
+function updateChart(app, otp, txn) {
+    riskChart.data.datasets[0].data = [app, otp, txn];
+    riskChart.update();
+}
+
+generateRisks();
+setInterval(generateRisks, 5000);
+
+</script>
 
 </body>
 </html>
