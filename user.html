@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>User Details</title>
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+}
+.box{
+background:#1e293b;
+padding:20px;
+margin:50px auto;
+width:60%;
+border-radius:10px;
+}
+button{
+padding:10px;
+margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>User Risk Details</h1>
+
+<div class="box">
+<p><strong>User ID:</strong> <span id="userId"></span></p>
+<p><strong>Amount:</strong> ₹<span id="amount"></span></p>
+<p><strong>Location:</strong> <span id="location"></span></p>
+<p><strong>Risk:</strong> <span id="risk"></span></p>
+<p><strong>Status:</strong> <span id="status"></span></p>
+</div>
+
+<button onclick="window.location.href='dashboard.html'">Back</button>
+
+<script>
+let params=new URLSearchParams(window.location.search);
+document.getElementById("userId").innerText=params.get("user");
+document.getElementById("amount").innerText=params.get("amount");
+document.getElementById("location").innerText=params.get("location");
+document.getElementById("risk").innerText=params.get("risk");
+document.getElementById("status").innerText=params.get("status");
+</script>
+
+</body>
+</html>
