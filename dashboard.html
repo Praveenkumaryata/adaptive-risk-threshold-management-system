@@ -12,41 +12,38 @@ body{
     text-align:center;
     margin:0;
 }
-
 .risk-box{
     background:#1e293b;
     padding:20px;
     margin:20px auto;
-    width:80%;
+    width:85%;
     border-radius:10px;
 }
-
 .progress{
     background:#334155;
     height:25px;
     border-radius:20px;
 }
-
 .progress-bar{
     height:25px;
     border-radius:20px;
     line-height:25px;
     transition:width 1s;
 }
-
 .alert{
     font-size:20px;
     font-weight:bold;
     margin:15px;
 }
-
 table{
     border-collapse:collapse;
-    margin:auto;
 }
-
-th, td{
+th,td{
     padding:10px;
+}
+button{
+    padding:10px;
+    margin:15px;
 }
 </style>
 </head>
@@ -54,7 +51,7 @@ th, td{
 <body>
 
 <script>
-if(localStorage.getItem("loggedIn") !== "true"){
+if(localStorage.getItem("loggedIn")!=="true"){
     window.location.href="index.html";
 }
 </script>
@@ -64,10 +61,10 @@ if(localStorage.getItem("loggedIn") !== "true"){
 <div class="risk-box">
 <h3>About This System</h3>
 <p>
-This system dynamically evaluates App Risk, OTP Risk and Transaction Risk.
-Risk increases when suspicious activities such as multiple OTP attempts,
-new device login, or high-value transactions are detected.
-Overall risk is calculated as average of all risk components.
+This system dynamically calculates App Risk, OTP Risk, and Transaction Risk.
+Risk increases when suspicious activities such as new device login,
+multiple OTP attempts, or high-value transactions occur.
+Overall risk is calculated as the average of all risk components.
 </p>
 </div>
 
@@ -94,102 +91,146 @@ Overall risk is calculated as average of all risk components.
 </div>
 
 <div class="risk-box">
-<h3>Recent Transactions</h3>
-<table border="1" width="100%">
+<h3>Recent User Transactions</h3>
+<table border="1" width="100%" style="color:white; text-align:center;">
 <tr>
-<th>User</th>
+<th>User ID</th>
 <th>Amount</th>
+<th>Location</th>
+<th>Risk</th>
 <th>Status</th>
 </tr>
+
 <tr>
-<td>User001</td>
+<td><a href="user.html?user=User001&amount=45000&location=Hyderabad&risk=30%25&status=Safe" style="color:cyan;">User001</a></td>
 <td>₹45,000</td>
-<td>Safe</td>
+<td>Hyderabad</td>
+<td>30%</td>
+<td style="color:green;">Safe</td>
 </tr>
+
 <tr>
-<td>User002</td>
+<td><a href="user.html?user=User002&amount=120000&location=Mumbai&risk=82%25&status=Flagged" style="color:cyan;">User002</a></td>
 <td>₹1,20,000</td>
+<td>Mumbai</td>
+<td>82%</td>
 <td style="color:red;">Flagged</td>
 </tr>
+
+<tr>
+<td><a href="user.html?user=User003&amount=8000&location=Chennai&risk=25%25&status=Safe" style="color:cyan;">User003</a></td>
+<td>₹8,000</td>
+<td>Chennai</td>
+<td>25%</td>
+<td style="color:green;">Safe</td>
+</tr>
+
+<tr>
+<td><a href="user.html?user=User004&amount=95000&location=Delhi&risk=68%25&status=Medium" style="color:cyan;">User004</a></td>
+<td>₹95,000</td>
+<td>Delhi</td>
+<td>68%</td>
+<td style="color:orange;">Medium</td>
+</tr>
+
+<tr>
+<td><a href="user.html?user=User005&amount=250000&location=Bangalore&risk=90%25&status=Flagged" style="color:cyan;">User005</a></td>
+<td>₹2,50,000</td>
+<td>Bangalore</td>
+<td>90%</td>
+<td style="color:red;">Flagged</td>
+</tr>
+
 </table>
 </div>
+
+<button onclick="downloadReport()">Download Risk Report</button>
 
 <canvas id="trendChart"></canvas>
 
 <script>
-let trendData = {
-    labels: [],
-    datasets:[{
-        label:'Overall Risk Trend',
-        data:[],
-        borderColor:'red',
-        fill:false
-    }]
+let trendData={
+labels:[],
+datasets:[{label:'Overall Risk Trend',data:[],borderColor:'red',fill:false}]
 };
 
-let chart = new Chart(document.getElementById("trendChart"),{
-    type:'line',
-    data:trendData
+let chart=new Chart(document.getElementById("trendChart"),{
+type:'line',
+data:trendData
 });
 
 function smartRisk(){
-    let otpAttempts = Math.floor(Math.random()*5);
-    let newDevice = Math.random()>0.7;
-    let highTxn = Math.random()>0.6;
+let otpAttempts=Math.floor(Math.random()*5);
+let newDevice=Math.random()>0.7;
+let highTxn=Math.random()>0.6;
 
-    let appRisk = newDevice?70:30;
-    let otpRisk = otpAttempts*15;
-    let txnRisk = highTxn?80:40;
+let appRisk=newDevice?70:30;
+let otpRisk=otpAttempts*15;
+let txnRisk=highTxn?80:40;
 
-    updateBar("app",appRisk);
-    updateBar("otp",otpRisk);
-    updateBar("txn",txnRisk);
+updateBar("app",appRisk);
+updateBar("otp",otpRisk);
+updateBar("txn",txnRisk);
 
-    let reasons=[];
-    if(newDevice) reasons.push("New device login detected.");
-    if(otpAttempts>2) reasons.push("Multiple OTP attempts detected.");
-    if(highTxn) reasons.push("High value transaction flagged.");
-    if(reasons.length===0) reasons.push("No suspicious activity detected.");
+let reasons=[];
+if(newDevice) reasons.push("New device login detected.");
+if(otpAttempts>2) reasons.push("Multiple OTP attempts detected.");
+if(highTxn) reasons.push("High value transaction flagged.");
+if(reasons.length===0) reasons.push("No suspicious activity detected.");
 
-    document.getElementById("explanation").innerText = reasons.join(" ");
+document.getElementById("explanation").innerText=reasons.join(" ");
 
-    let overall = Math.floor((appRisk+otpRisk+txnRisk)/3);
-    updateAlert(overall);
-    updateTrend(overall);
+let overall=Math.floor((appRisk+otpRisk+txnRisk)/3);
+updateAlert(overall);
+updateTrend(overall);
 }
 
 function updateBar(id,val){
-    let bar=document.getElementById(id);
-    bar.style.width=val+"%";
-    bar.innerText=val+"%";
+let bar=document.getElementById(id);
+bar.style.width=val+"%";
+bar.innerText=val+"%";
 
-    if(val<40) bar.style.background="green";
-    else if(val<70) bar.style.background="orange";
-    else bar.style.background="red";
+if(val<40) bar.style.background="green";
+else if(val<70) bar.style.background="orange";
+else bar.style.background="red";
 }
 
 function updateAlert(overall){
-    let alertBox=document.getElementById("alertBox");
-    if(overall>75){
-        alertBox.innerText="HIGH FRAUD ALERT";
-        alertBox.style.color="red";
-    } else if(overall>50){
-        alertBox.innerText="MEDIUM RISK";
-        alertBox.style.color="orange";
-    } else{
-        alertBox.innerText="LOW RISK";
-        alertBox.style.color="green";
-    }
+let alertBox=document.getElementById("alertBox");
+if(overall>75){
+alertBox.innerText="HIGH FRAUD ALERT";
+alertBox.style.color="red";
+}else if(overall>50){
+alertBox.innerText="MEDIUM RISK";
+alertBox.style.color="orange";
+}else{
+alertBox.innerText="LOW RISK";
+alertBox.style.color="green";
+}
 }
 
 function updateTrend(val){
-    if(trendData.labels.length>10){
-        trendData.labels.shift();
-        trendData.datasets[0].data.shift();
-    }
-    trendData.labels.push("");
-    trendData.datasets[0].data.push(val);
-    chart.update();
+if(trendData.labels.length>10){
+trendData.labels.shift();
+trendData.datasets[0].data.shift();
+}
+trendData.labels.push("");
+trendData.datasets[0].data.push(val);
+chart.update();
+}
+
+function downloadReport(){
+let content="Adaptive Risk Monitoring Report\n\n";
+content+="App Risk: "+document.getElementById("app").innerText+"\n";
+content+="OTP Risk: "+document.getElementById("otp").innerText+"\n";
+content+="Transaction Risk: "+document.getElementById("txn").innerText+"\n";
+content+="Status: "+document.getElementById("alertBox").innerText+"\n";
+
+let blob=new Blob([content],{type:"text/plain"});
+let link=document.createElement("a");
+link.href=URL.createObjectURL(blob);
+link.download="Risk_Report.txt";
+link.click();
 }
 
 smartRisk();
