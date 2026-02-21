@@ -6,42 +6,31 @@
 
 <style>
 body{
-    margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #0f0c29, #302b63, #24243e);
+    font-family: Arial;
+    background:#0f172a;
     color:white;
     text-align:center;
-}
-
-h1{
-    padding:20px;
-    letter-spacing:2px;
-    text-shadow:0 0 10px #00f7ff;
+    margin:0;
 }
 
 .risk-box{
-    background: rgba(255,255,255,0.05);
-    border:1px solid rgba(0,255,255,0.3);
-    backdrop-filter: blur(10px);
+    background:#1e293b;
     padding:20px;
     margin:20px auto;
-    width:70%;
-    border-radius:15px;
-    box-shadow:0 0 20px rgba(0,255,255,0.4);
+    width:80%;
+    border-radius:10px;
 }
 
 .progress{
-    background:rgba(255,255,255,0.1);
+    background:#334155;
     height:25px;
     border-radius:20px;
-    overflow:hidden;
 }
 
 .progress-bar{
     height:25px;
     border-radius:20px;
     line-height:25px;
-    font-weight:bold;
     transition:width 1s;
 }
 
@@ -51,16 +40,13 @@ h1{
     margin:15px;
 }
 
-button{
-    position:absolute;
-    right:20px;
-    top:20px;
-    padding:8px 15px;
-    background:#ff0033;
-    color:white;
-    border:none;
-    cursor:pointer;
-    border-radius:6px;
+table{
+    border-collapse:collapse;
+    margin:auto;
+}
+
+th, td{
+    padding:10px;
 }
 </style>
 </head>
@@ -73,9 +59,17 @@ if(localStorage.getItem("loggedIn") !== "true"){
 }
 </script>
 
-<button onclick="logout()">Logout</button>
+<h1>Adaptive AI-Based Fraud Risk Monitoring</h1>
 
-<h1>🚨 AI Fraud Risk Monitoring</h1>
+<div class="risk-box">
+<h3>About This System</h3>
+<p>
+This system dynamically evaluates App Risk, OTP Risk and Transaction Risk.
+Risk increases when suspicious activities such as multiple OTP attempts,
+new device login, or high-value transactions are detected.
+Overall risk is calculated as average of all risk components.
+</p>
+</div>
 
 <div id="alertBox" class="alert"></div>
 
@@ -100,8 +94,24 @@ if(localStorage.getItem("loggedIn") !== "true"){
 </div>
 
 <div class="risk-box">
-<h3>Activity Log</h3>
-<ul id="activityLog" style="text-align:left;"></ul>
+<h3>Recent Transactions</h3>
+<table border="1" width="100%">
+<tr>
+<th>User</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+<tr>
+<td>User001</td>
+<td>₹45,000</td>
+<td>Safe</td>
+</tr>
+<tr>
+<td>User002</td>
+<td>₹1,20,000</td>
+<td style="color:red;">Flagged</td>
+</tr>
+</table>
 </div>
 
 <canvas id="trendChart"></canvas>
@@ -112,7 +122,7 @@ let trendData = {
     datasets:[{
         label:'Overall Risk Trend',
         data:[],
-        borderColor:'#ff0033',
+        borderColor:'red',
         fill:false
     }]
 };
@@ -127,15 +137,15 @@ function smartRisk(){
     let newDevice = Math.random()>0.7;
     let highTxn = Math.random()>0.6;
 
-    let appRisk = newDevice?75:25;
-    let otpRisk = otpAttempts*20;
-    let txnRisk = highTxn?85:35;
+    let appRisk = newDevice?70:30;
+    let otpRisk = otpAttempts*15;
+    let txnRisk = highTxn?80:40;
 
     updateBar("app",appRisk);
     updateBar("otp",otpRisk);
     updateBar("txn",txnRisk);
 
-    let reasons = [];
+    let reasons=[];
     if(newDevice) reasons.push("New device login detected.");
     if(otpAttempts>2) reasons.push("Multiple OTP attempts detected.");
     if(highTxn) reasons.push("High value transaction flagged.");
@@ -146,7 +156,6 @@ function smartRisk(){
     let overall = Math.floor((appRisk+otpRisk+txnRisk)/3);
     updateAlert(overall);
     updateTrend(overall);
-    addLog(overall,reasons);
 }
 
 function updateBar(id,val){
@@ -154,22 +163,22 @@ function updateBar(id,val){
     bar.style.width=val+"%";
     bar.innerText=val+"%";
 
-    if(val<40) bar.style.background="#00ff88";
-    else if(val<70) bar.style.background="#ffcc00";
-    else bar.style.background="#ff0033";
+    if(val<40) bar.style.background="green";
+    else if(val<70) bar.style.background="orange";
+    else bar.style.background="red";
 }
 
 function updateAlert(overall){
     let alertBox=document.getElementById("alertBox");
     if(overall>75){
-        alertBox.innerText="🔴 HIGH FRAUD ALERT!";
-        alertBox.style.color="#ff0033";
+        alertBox.innerText="HIGH FRAUD ALERT";
+        alertBox.style.color="red";
     } else if(overall>50){
-        alertBox.innerText="🟡 MEDIUM RISK";
-        alertBox.style.color="#ffcc00";
+        alertBox.innerText="MEDIUM RISK";
+        alertBox.style.color="orange";
     } else{
-        alertBox.innerText="🟢 LOW RISK";
-        alertBox.style.color="#00ff88";
+        alertBox.innerText="LOW RISK";
+        alertBox.style.color="green";
     }
 }
 
@@ -181,24 +190,6 @@ function updateTrend(val){
     trendData.labels.push("");
     trendData.datasets[0].data.push(val);
     chart.update();
-}
-
-function addLog(overall,reasons){
-    let log=document.getElementById("activityLog");
-    let time=new Date().toLocaleTimeString();
-
-    let li=document.createElement("li");
-    li.innerText=time+" - Risk: "+overall+"% - "+reasons.join(" ");
-    log.prepend(li);
-
-    if(log.children.length>5){
-        log.removeChild(log.lastChild);
-    }
-}
-
-function logout(){
-    localStorage.removeItem("loggedIn");
-    window.location.href="index.html";
 }
 
 smartRisk();
